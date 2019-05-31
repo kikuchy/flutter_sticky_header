@@ -283,36 +283,77 @@ class RenderSliverStickyHeader extends RenderSliver with RenderSliverHelpers {
   bool hitTestChildren(HitTestResult result,
       {@required double mainAxisPosition, @required double crossAxisPosition}) {
     assert(geometry.hitTestExtent > 0.0);
-    if (header != null &&
-        mainAxisPosition - constraints.overlap <= _headerExtent) {
-      return hitTestBoxChild(result, header,
-              mainAxisPosition: mainAxisPosition - constraints.overlap,
-              crossAxisPosition: crossAxisPosition) ||
-          (_overlapsContent &&
-              child != null &&
-              child.geometry.hitTestExtent > 0.0 &&
-              child.hitTest(result,
-                  mainAxisPosition:
-                      mainAxisPosition - childMainAxisPosition(child),
-                  crossAxisPosition: crossAxisPosition));
-    } else if (child != null && child.geometry.hitTestExtent > 0.0) {
-      return child.hitTest(result,
-          mainAxisPosition: mainAxisPosition - childMainAxisPosition(child),
-          crossAxisPosition: crossAxisPosition);
+    if (reverse) {
+      if (child != null && child.geometry.hitTestExtent > 0.0 && mainAxisPosition - constraints.overlap <= child.geometry.hitTestExtent - _headerExtent) {
+        return child.hitTest(result,
+            mainAxisPosition: mainAxisPosition - childMainAxisPosition(child),
+            crossAxisPosition: crossAxisPosition);
+      } else if (header != null &&
+          mainAxisPosition - constraints.overlap >= child.geometry.hitTestExtent - _headerExtent) {
+        return hitTestBoxChild(result, header,
+            mainAxisPosition: mainAxisPosition - constraints.overlap,
+            crossAxisPosition: crossAxisPosition) ||
+            (_overlapsContent &&
+                child != null &&
+                child.geometry.hitTestExtent > 0.0 &&
+                child.hitTest(result,
+                    mainAxisPosition:
+                    mainAxisPosition - childMainAxisPosition(child),
+                    crossAxisPosition: crossAxisPosition));
+      } else {
+        return false;
+      }
+    } else {
+      if (header != null &&
+          mainAxisPosition - constraints.overlap <= _headerExtent) {
+        return hitTestBoxChild(result, header,
+            mainAxisPosition: mainAxisPosition - constraints.overlap,
+            crossAxisPosition: crossAxisPosition) ||
+            (_overlapsContent &&
+                child != null &&
+                child.geometry.hitTestExtent > 0.0 &&
+                child.hitTest(result,
+                    mainAxisPosition:
+                    mainAxisPosition - childMainAxisPosition(child),
+                    crossAxisPosition: crossAxisPosition));
+      } else
+      if (child != null && child.geometry.hitTestExtent > 0.0) {
+        return child.hitTest(result,
+            mainAxisPosition: mainAxisPosition - childMainAxisPosition(child),
+            crossAxisPosition: crossAxisPosition);
+      } else {
+        return false;
+      }
     }
-    return false;
   }
 
   @override
   double childMainAxisPosition(RenderObject child) {
-    if (child == header)
-      return _isPinned
-          ? 0.0
-          : -(constraints.scrollOffset + constraints.overlap);
-    if (child == this.child)
-      return calculatePaintOffset(constraints,
-          from: 0.0, to: headerLogicalExtent);
-    return null;
+    if (reverse) {
+      if (child == header) {
+        // FIXME: 多分条件違う
+        return _isPinned
+            ? 0.0
+            : -(constraints.scrollOffset + constraints.overlap);
+      }
+      if (child == this.child) {
+        // NOTE: _isPinned が非reverse時のときのフラグのため、_isPinned とともに要修正。
+        return (_isPinned && constraints.scrollOffset > 0)
+          ? -headerLogicalExtent
+          : 0.0;
+      }
+
+      return null;
+    } else {
+      if (child == header)
+        return _isPinned
+            ? 0.0
+            : -(constraints.scrollOffset + constraints.overlap);
+      if (child == this.child)
+        return calculatePaintOffset(constraints, from: 0.0, to: headerLogicalExtent);
+
+      return null;
+    }
   }
 
   @override
