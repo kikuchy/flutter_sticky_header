@@ -4,11 +4,9 @@ import 'package:flutter_sticky_header/src/widgets/sliver_sticky_header.dart';
 /// Immutable layout constraints for sticky header
 class StickyHeaderConstraints extends BoxConstraints {
   StickyHeaderConstraints({
-    this.state,
-    BoxConstraints boxConstraints,
-  })  : assert(state != null),
-        assert(boxConstraints != null),
-        super(
+    required this.state,
+    required BoxConstraints boxConstraints,
+  })  : super(
           minWidth: boxConstraints.minWidth,
           maxWidth: boxConstraints.maxWidth,
           minHeight: boxConstraints.minHeight,

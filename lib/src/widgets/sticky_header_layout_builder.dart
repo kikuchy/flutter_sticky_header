@@ -15,10 +15,9 @@ class StickyHeaderLayoutBuilder extends RenderObjectWidget {
   ///
   /// The [builder] argument must not be null.
   const StickyHeaderLayoutBuilder({
-    Key key,
-    @required this.builder,
-  })  : assert(builder != null),
-        super(key: key);
+    Key? key,
+    required this.builder,
+  })  : super(key: key);
 
   /// Called at layout time to construct the widget tree. The builder must not
   /// return null.
@@ -40,26 +39,27 @@ class _StickyHeaderLayoutBuilderElement extends RenderObjectElement {
       : super(widget);
 
   @override
-  StickyHeaderLayoutBuilder get widget => super.widget;
+  StickyHeaderLayoutBuilder get widget => super.widget as StickyHeaderLayoutBuilder;
 
   @override
-  RenderStickyHeaderLayoutBuilder get renderObject => super.renderObject;
+  RenderStickyHeaderLayoutBuilder get renderObject => super.renderObject as RenderStickyHeaderLayoutBuilder;
 
-  Element _child;
+  Element? _child;
 
   @override
   void visitChildren(ElementVisitor visitor) {
-    if (_child != null) visitor(_child);
+    if (_child != null) visitor(_child!);
   }
 
   @override
   void forgetChild(Element child) {
+    super.forgetChild(child);
     assert(child == _child);
     _child = null;
   }
 
   @override
-  void mount(Element parent, dynamic newSlot) {
+  void mount(Element? parent, dynamic newSlot) {
     super.mount(parent, newSlot); // Creates the renderObject.
     renderObject.callback = _layout;
   }
@@ -89,16 +89,14 @@ class _StickyHeaderLayoutBuilderElement extends RenderObjectElement {
   }
 
   void _layout(StickyHeaderConstraints constraints) {
-    owner.buildScope(this, () {
+    owner!.buildScope(this, () {
       Widget built;
-      if (widget.builder != null) {
-        try {
-          built = widget.builder(this, constraints);
-          debugWidgetBuilderValue(widget, built);
-        } catch (e, stack) {
-          built = ErrorWidget
-              .builder(_debugReportException('building $widget', e, stack));
-        }
+      try {
+        built = widget.builder(this, constraints);
+        debugWidgetBuilderValue(widget, built);
+      } catch (e, stack) {
+        built = ErrorWidget
+            .builder(_debugReportException('building $widget', e, stack));
       }
       try {
         _child = updateChild(_child, built, null);
@@ -144,7 +142,7 @@ FlutterErrorDetails _debugReportException(
       exception: exception,
       stack: stack,
       library: 'flutter_sticky_header widgets library',
-      context: context);
+      context: ErrorSummary(context));
   FlutterError.reportError(details);
   return details;
 }

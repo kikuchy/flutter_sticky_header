@@ -5,12 +5,12 @@ import 'package:flutter_sticky_header/src/rendering/sticky_header_constraints.da
 class RenderStickyHeaderLayoutBuilder extends RenderBox
     with RenderObjectWithChildMixin<RenderBox> {
   RenderStickyHeaderLayoutBuilder({
-    LayoutCallback<StickyHeaderConstraints> callback,
+    LayoutCallback<StickyHeaderConstraints>? callback,
   }) : _callback = callback;
 
-  LayoutCallback<StickyHeaderConstraints> get callback => _callback;
-  LayoutCallback<StickyHeaderConstraints> _callback;
-  set callback(LayoutCallback<StickyHeaderConstraints> value) {
+  LayoutCallback<StickyHeaderConstraints>? get callback => _callback;
+  LayoutCallback<StickyHeaderConstraints>? _callback;
+  set callback(LayoutCallback<StickyHeaderConstraints>? value) {
     if (value == _callback) return;
     _callback = value;
     markNeedsLayout();
@@ -18,7 +18,7 @@ class RenderStickyHeaderLayoutBuilder extends RenderBox
 
   // layout input
   @override
-  StickyHeaderConstraints get constraints => super.constraints;
+  StickyHeaderConstraints get constraints => super.constraints as StickyHeaderConstraints;
 
   bool _debugThrowIfNotCheckingIntrinsics() {
     assert(() {
@@ -60,22 +60,22 @@ class RenderStickyHeaderLayoutBuilder extends RenderBox
   @override
   void performLayout() {
     assert(callback != null);
-    invokeLayoutCallback(callback);
+    invokeLayoutCallback(callback!);
     if (child != null) {
-      child.layout(constraints, parentUsesSize: true);
-      size = constraints.constrain(child.size);
+      child!.layout(constraints, parentUsesSize: true);
+      size = constraints.constrain(child!.size);
     } else {
       size = constraints.biggest;
     }
   }
 
   @override
-  bool hitTestChildren(HitTestResult result, {Offset position}) {
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
     return child?.hitTest(result, position: position) ?? false;
   }
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    if (child != null) context.paintChild(child, offset);
+    if (child != null) context.paintChild(child!, offset);
   }
 }

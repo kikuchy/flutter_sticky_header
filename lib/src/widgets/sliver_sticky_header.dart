@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/src/rendering/sliver_sticky_header.dart';
 import 'package:flutter_sticky_header/src/widgets/sticky_header_layout_builder.dart';
@@ -13,8 +14,7 @@ class SliverStickyHeaderState {
   const SliverStickyHeaderState(
     this.scrollPercentage,
     this.isPinned,
-  )   : assert(scrollPercentage != null),
-        assert(isPinned != null);
+  );
 
   final double scrollPercentage;
 
@@ -46,20 +46,18 @@ class SliverStickyHeader extends RenderObjectWidget {
   ///
   /// The [overlapsContent] argument must not be null.
   SliverStickyHeader({
-    Key key,
+    Key? key,
     this.header,
     this.sliver,
     this.overlapsContent: false,
     this.reverse: false,
-  })  : assert(overlapsContent != null),
-        assert(reverse != null),
-        super(key: key);
+  })  : super(key: key);
 
   /// The header to display before the sliver.
-  final Widget header;
+  final Widget? header;
 
   /// The sliver to display after the header.
-  final Widget sliver;
+  final Widget? sliver;
 
   /// Whether the header should be drawn on top of the sliver
   /// instead of before.
@@ -100,15 +98,12 @@ class SliverStickyHeaderBuilder extends StatelessWidget {
   ///
   /// The [builder] and [overlapsContent] arguments must not be null.
   const SliverStickyHeaderBuilder({
-    Key key,
-    @required this.builder,
+    Key? key,
+    required this.builder,
     this.sliver,
     this.overlapsContent: false,
     this.reverse: false,
-  })  : assert(builder != null),
-        assert(overlapsContent != null),
-        assert(reverse != null),
-        super(key: key);
+  })  : super(key: key);
 
   /// Called to build the [SliverStickyHeader]'s header.
   ///
@@ -117,7 +112,7 @@ class SliverStickyHeaderBuilder extends StatelessWidget {
   final SliverStickyHeaderWidgetBuilder builder;
 
   /// The sliver to display after the header.
-  final Widget sliver;
+  final Widget? sliver;
 
   /// Whether the header should be drawn on top of the sliver
   /// instead of before.
@@ -144,26 +139,30 @@ class SliverStickyHeaderRenderObjectElement extends RenderObjectElement {
       : super(widget);
 
   @override
-  SliverStickyHeader get widget => super.widget;
+  SliverStickyHeader get widget => super.widget as SliverStickyHeader;
 
-  Element _header;
+  @override
+  RenderSliverStickyHeader get renderObject => super.renderObject as RenderSliverStickyHeader;
 
-  Element _sliver;
+  Element? _header;
+
+  Element? _sliver;
 
   @override
   void visitChildren(ElementVisitor visitor) {
-    if (_header != null) visitor(_header);
-    if (_sliver != null) visitor(_sliver);
+    if (_header != null) visitor(_header!);
+    if (_sliver != null) visitor(_sliver!);
   }
 
   @override
   void forgetChild(Element child) {
+    super.forgetChild(child);
     if (child == _header) _header = null;
     if (child == _sliver) _sliver = null;
   }
 
   @override
-  void mount(Element parent, dynamic newSlot) {
+  void mount(Element? parent, dynamic newSlot) {
     super.mount(parent, newSlot);
     _header = updateChild(_header, widget.header, 0);
     _sliver = updateChild(_sliver, widget.sliver, 1);
@@ -178,10 +177,10 @@ class SliverStickyHeaderRenderObjectElement extends RenderObjectElement {
   }
 
   @override
-  void insertChildRenderObject(RenderObject child, int slot) {
+  void insertChildRenderObject(RenderObject child, int? slot) {
     final RenderSliverStickyHeader renderObject = this.renderObject;
-    if (slot == 0) renderObject.header = child;
-    if (slot == 1) renderObject.child = child;
+    if (slot == 0) renderObject.header = child as RenderBox?;
+    if (slot == 1) renderObject.child = child as RenderSliver?;
     assert(renderObject == this.renderObject);
   }
 
